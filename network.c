@@ -55,17 +55,15 @@ void handle(int socket)
 	char recvBuf[1024 * 8];
 	while(1)
 	{
-		/*
-			struct ethhdr
-			{
-    			unsigned char h_dest[ETH_ALEN]; //目的MAC地址
-     
-    			unsigned char h_source[ETH_ALEN]; //源MAC地址
-     
-    			__u16 h_proto ; //网络层所使用的协议类型
-			}__attribute__((packed))
---------------------- 
-		*/
+		/**
+		 *	struct ethhdr
+		 *	{
+    	 *		unsigned char h_dest[ETH_ALEN]; //目的MAC地址
+    	 *		unsigned char h_source[ETH_ALEN]; //源MAC地址
+    	 *		__u16 h_proto; //网络层所使用的协议类型
+		 *	}__attribute__((packed))
+		**/
+		
 		int n = recvfrom(socket, recvBuf, sizeof(recvBuf), 0, NULL, NULL);
 		if (n > 0)
 		{
@@ -75,6 +73,7 @@ void handle(int socket)
 				err_msg("pstEthHdr is NULL");
 				continue;
 			}
+			
 			switch(pstEthHdr->h_proto)
 			{
 				case ETH_P_IP:
