@@ -16,7 +16,7 @@ err_ret(const char *fmt, ...)
 	va_list		ap;
 
 	va_start(ap, fmt);
-	err_doit(1, LOG_INFO, fmt, ap);
+	err_doit(LOG_INFO, fmt, ap);
 	va_end(ap);
 	return;
 }
@@ -30,7 +30,7 @@ err_sys(const char *fmt, ...)
 	va_list		ap;
 
 	va_start(ap, fmt);
-	err_doit(1, LOG_ERR, fmt, ap);
+	err_doit(LOG_ERR, fmt, ap);
 	va_end(ap);
 	exit(1);
 }
@@ -44,7 +44,7 @@ err_dump(const char *fmt, ...)
 	va_list		ap;
 
 	va_start(ap, fmt);
-	err_doit(1, LOG_ERR, fmt, ap);
+	err_doit(LOG_ERR, fmt, ap);
 	va_end(ap);
 	abort();		/* dump core and terminate */
 	exit(1);		/* shouldn't get here */
@@ -59,7 +59,7 @@ err_msg(const char *fmt, ...)
 	va_list		ap;
 
 	va_start(ap, fmt);
-	err_doit(0, LOG_INFO, fmt, ap);
+	err_doit(LOG_INFO, fmt, ap);
 	va_end(ap);
 	return;
 }
@@ -73,7 +73,7 @@ err_quit(const char *fmt, ...)
 	va_list		ap;
 
 	va_start(ap, fmt);
-	err_doit(0, LOG_ERR, fmt, ap);
+	err_doit(LOG_ERR, fmt, ap);
 	va_end(ap);
 	exit(1);
 }
@@ -82,7 +82,7 @@ err_quit(const char *fmt, ...)
  * Caller specifies "errnoflag" and "level". */
 
 void
-err_doit(int errnoflag, int level, const char *fmt, va_list ap)
+err_doit(int level, const char *fmt, va_list ap)
 {
 	int		errno_save, n;
 	char	buf[MAXLINE] = {'\0'};
@@ -92,13 +92,14 @@ err_doit(int errnoflag, int level, const char *fmt, va_list ap)
 	vsnprintf(buf, sizeof(buf), fmt, ap);	/* this is safe */
 
 	n = strlen(buf);
-	if (errnoflag)
-		snprintf(buf+n, sizeof(buf)-n, ": %s", strerror(errno_save));
-	strcat(buf, "\n");
+	snprintf(buf+n, sizeof(buf)-n, ": %s\n", strerror(errno_save));
 
-	if (daemon_proc) {
+	if (daemon_proc) 
+	{
 		syslog(level, buf);
-	} else {
+	}
+	else
+	{
 		fflush(stdout);		/* in case stdout and stderr are the same */
 		fputs(buf, stderr);
 		fflush(stderr);
